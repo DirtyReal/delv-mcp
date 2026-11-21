@@ -1,0 +1,40 @@
+{
+  "name": "@delv-tools/mcp",
+  "version": "0.2.1",
+  "description": "MCP server for delv.tools: search AI tools, MCP servers, Agent Skills and agents, and read Delv's safety grades, compatibility matrix and repository health, from any MCP client.",
+  "type": "module",
+  "bin": {
+    "delv-mcp": "index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node index.js",
+    "inspect": "npx @modelcontextprotocol/inspector node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "anthropic",
+    "ai-tools",
+    "directory",
+    "delv"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DirtyReal/delv-mcp.git"
+  },
+  "homepage": "https://delv.tools",
+  "author": "Delv <hello@delv.tools>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  }
+}
