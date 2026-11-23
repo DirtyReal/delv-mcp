@@ -1,6 +1,7 @@
 {
   "name": "@delv-tools/mcp",
   "version": "0.2.1",
+  "mcpName": "io.github.DirtyReal/delv-mcp",
   "description": "MCP server for delv.tools: search AI tools, MCP servers, Agent Skills and agents, and read Delv's safety grades, compatibility matrix and repository health, from any MCP client.",
   "type": "module",
   "bin": {
