@@ -46,7 +46,7 @@ const TOOLS = [
   {
     name: 'search_tools',
     description:
-      'Search the delv.tools AI tools directory (2,000+ tools) for apps, platforms, and services. Use when the user asks about AI apps, SaaS tools, or products. Returns ranked editorial picks with short descriptions and links.',
+      'Search the delv.tools AI tools directory (2,000+ tools) for apps, platforms, and services. Use when the user asks about AI apps, SaaS tools, or products. Returns matching listings with short descriptions and links.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -147,7 +147,7 @@ const TOOLS = [
   {
     name: 'get_pulse',
     description:
-      "Fetch recent AI news from Delv Pulse - curated, editorialised coverage of model releases, MCP drops, Skill launches, and developer chatter. Use when the user asks what's new in AI, what shipped recently, or for a briefing.",
+      "Fetch stories from Delv Pulse, Delv's archive of AI news (model releases, MCP servers, Skills, developer tools). Pulse is paused, so it holds no new stories at present. Use when the user asks for Delv Pulse or for what it covered in a past period.",
     inputSchema: {
       type: 'object',
       properties: {
@@ -176,7 +176,7 @@ const TOOLS = [
   {
     name: 'get_safety',
     description:
-      "Fetch Delv's safety grade (A+ through F) for an MCP server, Agent Skill, autonomous Agent, or MCP Client. Grade reflects maintainer legitimacy, permission scope, supply chain, transparency, and incident history. Use before suggesting a user install something with sensitive access.",
+      "Fetch Delv's safety grade (A+ through F) for an MCP server, Agent Skill, autonomous Agent, or MCP Client. Grade reflects maintainer legitimacy, permission scope, supply chain, transparency, and incident history. Use when the user asks how safe a listing is.",
     inputSchema: {
       type: 'object',
       properties: {
@@ -213,6 +213,26 @@ const TOOLS = [
     },
   },
 ];
+
+// A name to show a person, and what kind of tool each one is. Every tool here only reads
+// Delv's own catalogue: nothing is written and nothing outside Delv is reached.
+const TITLES = {
+  search_tools: 'Search AI tools',
+  get_tool: 'Get an AI tool listing',
+  search_mcps: 'Search MCP servers',
+  get_mcp: 'Get an MCP server listing',
+  search_skills: 'Search Agent Skills',
+  search_agents: 'Search AI agents',
+  search_mcp_clients: 'Search MCP clients',
+  get_safety: 'Get a safety grade',
+  get_compatibility: 'Check server and client compatibility',
+  get_health: 'Get repository health',
+  get_pulse: 'Get Delv Pulse stories',
+};
+for (const tool of TOOLS) {
+  tool.title = TITLES[tool.name];
+  tool.annotations = { title: tool.title, readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
+}
 
 // ---------- Response formatting ----------
 
@@ -317,7 +337,9 @@ const handlers = {
   async search_tools({ query, category, limit = 10 }) {
     const params = {};
     if (query) params.search = query;
-    if (category) params.category = category;
+    // The API takes a category's slug as `categorySlug`; its `category` wants a database id,
+    // which is why this filter returned nothing before 0.3.0.
+    if (category) params.categorySlug = category;
     params.limit = Math.min(limit, 50);
     const tools = await fetchJson('/api/tools', params);
     return (tools || []).map(formatTool);
@@ -444,7 +466,7 @@ const handlers = {
 // ---------- MCP server boilerplate ----------
 
 const server = new Server(
-  { name: 'delv', version: '0.2.1' },
+  { name: 'delv', version: '0.3.0' },
   { capabilities: { tools: {} } },
 );
 

@@ -4,6 +4,22 @@ Search [delv.tools](https://delv.tools) from any MCP client: Claude Desktop, Cla
 
 Delv is a directory of AI tools, MCP servers, Agent Skills and agents. This server lets your agent look things up there without opening the site. It runs on your machine, reads Delv's public API, and needs no account or API key.
 
+## Use it without installing anything
+
+Delv also runs this server for you. Add this address as a remote MCP server (streamable HTTP, no sign-in):
+
+```
+https://mcp.delv.tools/mcp
+```
+
+In Claude Code:
+
+```
+claude mcp add --transport http delv https://mcp.delv.tools/mcp
+```
+
+It has the same tools as the package below, is read-only, and allows 60 requests a minute.
+
 ## Install
 
 Add this to your client's MCP config (for Claude Desktop, `claude_desktop_config.json`):
