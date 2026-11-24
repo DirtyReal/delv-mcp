@@ -1,7 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.DirtyReal/delv-mcp",
+  "title": "Delv",
   "description": "Search Delv's directory of AI tools, MCP servers, Agent Skills and agents. No API key.",
+  "websiteUrl": "https://delv.tools/mcp/delv",
+  "icons": [
+    {
+      "src": "https://mcp.delv.tools/icon.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    }
+  ],
   "repository": {
     "url": "https://github.com/DirtyReal/delv-mcp",
     "source": "github"

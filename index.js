@@ -686,7 +686,10 @@ const SERVER_INFO = {
     title: 'Delv',
     version: '0.4.0',
     websiteUrl: 'https://delv.tools',
-    icons: [{ src: 'https://delv.tools/images/hotlink-ok/delv-icon-512.png', mimeType: 'image/png', sizes: ['512x512'] }],
+    // Served from the MCP server's own name, which is not behind Cloudflare: directories and
+    // assistants fetch icons from data centres, which the main site's bot check turns away.
+    // nginx serves the file (a copy of public/images/hotlink-ok/delv-icon-512.png).
+    icons: [{ src: 'https://mcp.delv.tools/icon.png', mimeType: 'image/png', sizes: ['512x512'] }],
 };
 // What an assistant is told about the server as a whole when it connects. It describes the
 // data and how the tools fit together. It asks for nothing and steers nothing.
