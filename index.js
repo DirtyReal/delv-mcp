@@ -26,7 +26,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 
 const API = process.env.DELV_API_URL || 'https://delv.tools'
-const UA = '@delv-tools/mcp/0.4.0'
+const UA = '@delv-tools/mcp/0.4.1'
 const TIMEOUT_MS = 15000
 
 // The API answered, but not with 200. The status travels with the error so a tool can tell
@@ -326,6 +326,12 @@ const asRow = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
 const asList = (v) => (Array.isArray(v) ? v.map(asRow) : []);
 const nameOf = (v) => asRow(v).name;
 const day = (v) => (typeof v === 'string' && v.length >= 10 ? v.slice(0, 10) : null);
+// The same day as people write it ("18 April 2026"), for wording an assistant will repeat.
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const longDay = (v) => {
+    const [year, month, date] = (day(v) ?? '').split('-').map(Number);
+    return year && MONTHS[month - 1] && date ? `${date} ${MONTHS[month - 1]} ${year}` : null;
+};
 const listOf = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') : []);
 // The tag that marks a listing whose maintainers archived it (src/lib/mcp-search.ts).
 const isArchived = (row) => listOf(row.tags).includes('archived');
@@ -572,12 +578,17 @@ const HANDLERS = new Map([
                 throw new Plain(`Delv has no safety notes for the ${type} listing "${slug}". Check the slug with a search; not every listing has notes.`);
             const data = asRow(raw);
             const withdrawn = data.overallGrade === 'UNRATED';
+            const written = data.assessedAt ?? data.updatedAt;
+            const grade = GRADES[String(data.overallGrade)] ?? String(data.overallGrade);
             return {
                 itemType: data.itemType,
                 itemSlug: data.itemSlug,
                 basis: 'Drafted with AI from public information about the project. Not a security audit, and not a test of the software.',
-                writtenOn: day(data.assessedAt) ?? day(data.updatedAt),
-                overallGrade: GRADES[String(data.overallGrade)] ?? data.overallGrade,
+                writtenOn: day(written),
+                // The grade never travels alone. An assistant repeats this field as it stands, and one
+                // was seen giving "Delv gives it a C safety grade" with the basis line left behind
+                // (24 Nov 2026), so the grade says what it is in the same phrase.
+                overallGrade: withdrawn ? grade : `${grade} (from AI-drafted notes${longDay(written) ? ` of ${longDay(written)}` : ''}, not a security audit)`,
                 ...(withdrawn ? {} : { overallScore: data.overallScore }),
                 scores: withdrawn
                     ? undefined
@@ -684,7 +695,7 @@ async function callTool(name, args) {
 const SERVER_INFO = {
     name: 'delv',
     title: 'Delv',
-    version: '0.4.0',
+    version: '0.4.1',
     websiteUrl: 'https://delv.tools',
     // Served from the MCP server's own name, which is not behind Cloudflare: directories and
     // assistants fetch icons from data centres, which the main site's bot check turns away.
